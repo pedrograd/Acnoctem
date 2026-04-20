@@ -151,7 +151,7 @@ body {
 }
 
 .profile-wrapper:hover .profile-img {
-    transform: scale(1.5); /* Subtle extra zoom on hover */
+    transform: scale(1.9); /* Subtle extra zoom on hover */
     filter: contrast(1.05) brightness(1.02);
 }
 
@@ -190,7 +190,7 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 1.1rem;
+    padding: 1.25rem 1.1rem; /* Slightly more vertical padding for larger font */
     border-radius: 18px;
     text-decoration: none;
     background: linear-gradient(135deg, var(--accent-purple) 0%, #A855F7 50%, var(--accent-pink) 100%);
@@ -216,14 +216,14 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.2rem;
+    gap: 0.1rem;
 }
 
 .btn-text-main {
-    font-weight: 800;
-    font-size: 1.5rem; /* Larger font size for TELEGRAM */
-    letter-spacing: 0.12em;
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    font-weight: 900;
+    font-size: 1.8rem; /* Dramatically larger font size for TELEGRAM */
+    letter-spacing: 0.15em;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 .btn-text-main.uppercase {
@@ -231,11 +231,11 @@ body {
 }
 
 .btn-text-sub {
-    font-weight: 400;
-    font-size: 0.65rem; /* Small font size for subtext */
+    font-weight: 500;
+    font-size: 0.6rem; /* Very small font size for subtext as requested */
     letter-spacing: 0.02em;
-    color: rgba(255, 255, 255, 0.9);
-    margin-top: -2px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-top: -4px;
 }
 
 .btn-primary-glow {
