@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. Funnel attribution. Never blocks navigation if analytics is unavailable.
+    document.querySelectorAll('[data-funnel-event]').forEach(link => {
+        link.addEventListener('click', () => {
+            if (typeof window.gtag !== 'function') return;
+            window.gtag('event', 'funnel_outbound_click', {
+                destination: link.dataset.funnelEvent,
+                link_url: link.href,
+                transport_type: 'beacon'
+            });
+        });
+    });
+
     // 1. Smooth Fade-in sequence
     const container = document.querySelector('.fade-in-section');
     if (container) {
