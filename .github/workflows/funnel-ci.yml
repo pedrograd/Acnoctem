@@ -1,0 +1,50 @@
+name: Funnel CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "script.js"
+      - "style.css"
+      - "CNAME"
+      - ".github/workflows/funnel-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "script.js"
+      - "style.css"
+      - "CNAME"
+      - ".github/workflows/funnel-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: JavaScript syntax
+        run: node --check script.js
+      - name: Funnel contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'funnel_landing' script.js
+          grep -q 'funnel_outbound_click' script.js
+          grep -q 'data-funnel-event="telegram_primary"' index.html
+          grep -q 'https://acnoctem.net/' index.html
+          test "$(tr -d '\r\n ' < CNAME)" = "acnoctem.net"
+      - name: No obvious secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RniE --exclude-dir=.git '(sk-[A-Za-z0-9_-]{20,}|bot[0-9]{8,}:[A-Za-z0-9_-]{20,}|postgres(ql)?://[^[:space:]]+:[^[:space:]]+@|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY)' .; then
+            echo "::error::Potential secret found in public funnel repository"
+            exit 1
+          fi
