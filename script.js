@@ -1,4 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const CANONICAL_FUNNEL = Object.freeze({
+        visit: 'funnel_visit',
+        lead: 'funnel_lead'
+    });
+
+    const emitAnalytics = (eventName, parameters) => {
+        if (typeof window.gtag !== 'function') return;
+        window.gtag('event', eventName, {
+            ...parameters,
+            transport_type: 'beacon'
+        });
+    };
+
     // 0. Privacy-safe landing attribution. Keep only bounded campaign labels and referrer host.
     const cleanAttributionValue = (value) => {
         if (!value) return '(not set)';
@@ -15,26 +28,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const params = new URLSearchParams(window.location.search);
-    if (typeof window.gtag === 'function') {
-        window.gtag('event', 'funnel_landing', {
-            utm_source: cleanAttributionValue(params.get('utm_source')),
-            utm_medium: cleanAttributionValue(params.get('utm_medium')),
-            utm_campaign: cleanAttributionValue(params.get('utm_campaign')),
-            referrer_host: cleanAttributionValue(referrerHost),
-            landing_path: window.location.pathname.slice(0, 120),
-            transport_type: 'beacon'
-        });
-    }
+    const landingAttribution = {
+        stage: 'visit',
+        evidence: 'web_observed',
+        utm_source: cleanAttributionValue(params.get('utm_source')),
+        utm_medium: cleanAttributionValue(params.get('utm_medium')),
+        utm_campaign: cleanAttributionValue(params.get('utm_campaign')),
+        referrer_host: cleanAttributionValue(referrerHost),
+        landing_path: window.location.pathname.slice(0, 120)
+    };
+    emitAnalytics(CANONICAL_FUNNEL.visit, landingAttribution);
+    // Backward-compatible event while historical GA4 reports migrate to funnel_visit.
+    emitAnalytics('funnel_landing', landingAttribution);
 
     // 1. Outbound funnel clicks. Never blocks navigation if analytics is unavailable.
     document.querySelectorAll('[data-funnel-event]').forEach(link => {
         link.addEventListener('click', () => {
-            if (typeof window.gtag !== 'function') return;
-            window.gtag('event', 'funnel_outbound_click', {
-                destination: link.dataset.funnelEvent,
+            const destination = link.dataset.funnelEvent;
+            emitAnalytics('funnel_outbound_click', {
+                destination,
                 link_url: link.href,
-                transport_type: 'beacon'
+                evidence: 'web_observed'
             });
+            if (destination === 'telegram_primary') {
+                emitAnalytics(CANONICAL_FUNNEL.lead, {
+                    stage: 'lead',
+                    evidence: 'web_observed',
+                    signal: 'telegram_primary_click',
+                    boundary: 'outbound_intent_only'
+                });
+            }
         });
     });
 
