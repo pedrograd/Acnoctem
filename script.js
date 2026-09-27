@@ -1,5 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 0. Funnel attribution. Never blocks navigation if analytics is unavailable.
+    // 0. Privacy-safe landing attribution. Keep only bounded campaign labels and referrer host.
+    const cleanAttributionValue = (value) => {
+        if (!value) return '(not set)';
+        return String(value).trim().slice(0, 100).replace(/[^a-zA-Z0-9._~:/@+\- ]/g, '_');
+    };
+
+    let referrerHost = '(direct)';
+    if (document.referrer) {
+        try {
+            referrerHost = new URL(document.referrer).hostname || '(direct)';
+        } catch {
+            referrerHost = '(invalid)';
+        }
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (typeof window.gtag === 'function') {
+        window.gtag('event', 'funnel_landing', {
+            utm_source: cleanAttributionValue(params.get('utm_source')),
+            utm_medium: cleanAttributionValue(params.get('utm_medium')),
+            utm_campaign: cleanAttributionValue(params.get('utm_campaign')),
+            referrer_host: cleanAttributionValue(referrerHost),
+            landing_path: window.location.pathname.slice(0, 120),
+            transport_type: 'beacon'
+        });
+    }
+
+    // 1. Outbound funnel clicks. Never blocks navigation if analytics is unavailable.
     document.querySelectorAll('[data-funnel-event]').forEach(link => {
         link.addEventListener('click', () => {
             if (typeof window.gtag !== 'function') return;
@@ -11,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 1. Smooth Fade-in sequence
+    // 2. Smooth Fade-in sequence
     const container = document.querySelector('.fade-in-section');
     if (container) {
         // Fast enough to not annoy, slow enough to feel expensive
@@ -20,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 50);
     }
 
-    // 2. Premium 3D interaction for secondary links
+    // 3. Premium 3D interaction for secondary links
     const cards = document.querySelectorAll('.btn-secondary');
     
     cards.forEach(card => {
@@ -44,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. Luxurious Ripple Effect for Primary CTA
+    // 4. Luxurious Ripple Effect for Primary CTA
     const primaryCta = document.querySelector('.btn-primary');
     
     if (primaryCta) {
