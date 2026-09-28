@@ -267,10 +267,41 @@ body {
 }
 
 /* SECONDARY CTA */
-.social-links {
+.link-groups {
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: 1.25rem;
+}
+
+.link-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.link-group-title {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.social-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.link-group:first-child .social-links a:first-child {
+    grid-column: 1 / -1;
+}
+
+.link-note {
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.5;
 }
 
 .btn-secondary {
@@ -287,8 +318,10 @@ body {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     font-weight: 400;
-    font-size: 0.95rem;
-    letter-spacing: 0.06em;
+    min-height: 52px;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    text-align: center;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
@@ -368,8 +401,7 @@ body {
 /* STAGGERED ENTRY */
 .fade-in-section .hero { opacity: 0; animation: revealUp 1.2s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .fade-in-section .btn-primary { opacity: 0; animation: revealUp 1.2s 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.fade-in-section .btn-secondary:nth-child(1) { opacity: 0; animation: revealUp 1.2s 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.fade-in-section .btn-secondary:nth-child(2) { opacity: 0; animation: revealUp 1.2s 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.fade-in-section .link-groups { opacity: 0; animation: revealUp 1.2s 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .fade-in-section .quote-section { opacity: 0; animation: revealUp 1.2s 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .fade-in-section .site-footer { opacity: 0; animation: revealUp 1.2s 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
@@ -381,7 +413,21 @@ body {
 /* MOBILE ADAPTATION */
 @media (max-width: 480px) {
     .container {
-        padding: 4rem 1.25rem 2.5rem;
+        max-width: 440px;
+        padding: 3rem 1rem 2.5rem;
+    }
+
+    .social-links { gap: 0.55rem; }
+
+    .btn-secondary {
+        padding: 0.85rem 0.55rem;
+        font-size: 0.82rem;
+        overflow-wrap: anywhere;
+    }
+
+    .btn-text-main {
+        font-size: 1.25rem;
+        letter-spacing: 0.02em;
     }
     
     .profile-wrapper {
