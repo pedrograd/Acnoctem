@@ -82,9 +82,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* JS uses this for fade in */
-    opacity: 0;
-    transform: translateY(25px);
+    /* Content remains visible if JavaScript is unavailable. */
+    opacity: 1;
+    transform: none;
 }
 
 .container.visible {
@@ -400,5 +400,36 @@ body {
     
     .ambient-glow.secondary {
         filter: blur(70px);
+    }
+}
+
+
+/* Keyboard users need a clear, high-contrast indicator on every outbound link. */
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+    outline: 3px solid #f8f8f8;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgba(139, 61, 255, 0.8);
+}
+
+/* Keep the full page still and visible for visitors who request reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .container,
+    .fade-in-section *,
+    .fade-in-section *::before,
+    .fade-in-section *::after {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
     }
 }
