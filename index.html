@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZP5X2PSTZP"></script>
+    <!-- Google tag (gtag.js) with analytics consent denied by default. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied'
+      });
       gtag('js', new Date());
-
       gtag('config', 'G-ZP5X2PSTZP');
     </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZP5X2PSTZP"></script>
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
@@ -118,6 +123,14 @@
         </footer>
     </div>
     
+    <div id="analytics-consent" class="consent-banner" role="dialog" aria-label="Analitik çerez izni" aria-live="polite">
+        <p>Site kullanımını anlamak için isteğe bağlı analitik çerezlere izin verilsin mi?</p>
+        <div class="consent-actions">
+            <button id="consent-reject" class="consent-button" type="button">Reddet</button>
+            <button id="consent-accept" class="consent-button consent-accept" type="button">Kabul et</button>
+        </div>
+    </div>
+
     <script src="script.js" defer></script>
 </body>
 </html>
