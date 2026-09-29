@@ -1,18 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const CONSENT_KEY = 'acnoctem_consent_v1';
     const CANONICAL_FUNNEL = Object.freeze({
         visit: 'funnel_visit',
         lead: 'funnel_lead'
     });
+    const consentBanner = document.getElementById('analytics-consent');
+    const consentAccept = document.getElementById('consent-accept');
+    const consentReject = document.getElementById('consent-reject');
+    let visitSent = false;
+
+    const analyticsAllowed = () =>
+        localStorage.getItem(CONSENT_KEY) === 'accepted' && typeof window.gtag === 'function';
 
     const emitAnalytics = (eventName, parameters) => {
-        if (typeof window.gtag !== 'function') return;
+        if (!analyticsAllowed()) return;
         window.gtag('event', eventName, {
             ...parameters,
             transport_type: 'beacon'
         });
     };
 
-    // 0. Privacy-safe landing attribution. Keep only bounded campaign labels and referrer host.
+    // Privacy-safe landing attribution. Keep only bounded campaign labels and referrer host.
     const cleanAttributionValue = (value) => {
         if (!value) return '(not set)';
         return String(value).trim().slice(0, 100).replace(/[^a-zA-Z0-9._~:/@+\- ]/g, '_');
@@ -37,11 +45,48 @@ document.addEventListener('DOMContentLoaded', () => {
         referrer_host: cleanAttributionValue(referrerHost),
         landing_path: window.location.pathname.slice(0, 120)
     };
-    emitAnalytics(CANONICAL_FUNNEL.visit, landingAttribution);
-    // Backward-compatible event while historical GA4 reports migrate to funnel_visit.
-    emitAnalytics('funnel_landing', landingAttribution);
 
-    // 1. Outbound funnel clicks. Never blocks navigation if analytics is unavailable.
+    const emitVisit = () => {
+        if (visitSent || !analyticsAllowed()) return;
+        visitSent = true;
+        emitAnalytics(CANONICAL_FUNNEL.visit, landingAttribution);
+        // Backward-compatible event while historical GA4 reports migrate to funnel_visit.
+        emitAnalytics('funnel_landing', landingAttribution);
+    };
+
+    const updateConsent = (granted) => {
+        if (typeof window.gtag !== 'function') return;
+        window.gtag('consent', 'update', {
+            analytics_storage: granted ? 'granted' : 'denied'
+        });
+    };
+
+    const hideConsent = () => {
+        if (consentBanner) consentBanner.hidden = true;
+    };
+
+    const handleConsent = (granted) => {
+        localStorage.setItem(CONSENT_KEY, granted ? 'accepted' : 'rejected');
+        updateConsent(granted);
+        hideConsent();
+        if (granted) emitVisit();
+    };
+
+    const storedConsent = localStorage.getItem(CONSENT_KEY);
+    if (storedConsent === 'accepted') {
+        updateConsent(true);
+        hideConsent();
+        emitVisit();
+    } else if (storedConsent === 'rejected') {
+        hideConsent();
+    } else if (consentBanner) {
+        consentBanner.hidden = false;
+    }
+
+    if (consentAccept) consentAccept.addEventListener('click', () => handleConsent(true));
+    if (consentReject) consentReject.addEventListener('click', () => handleConsent(false));
+
+    // Outbound funnel clicks. Never blocks navigation if analytics is unavailable.
     document.querySelectorAll('[data-funnel-event]').forEach(link => {
         link.addEventListener('click', () => {
             const destination = link.dataset.funnelEvent;
