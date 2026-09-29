@@ -58,5 +58,15 @@ jobs:
               raise SystemExit(f"Missing local assets: {missing}")
           ET.parse("sitemap.xml")
 
+      - name: Verify consent-gated analytics
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq "analytics_storage: 'denied'" index.html
+          grep -Fq 'id="analytics-consent"' index.html
+          grep -Fq "localStorage.getItem(CONSENT_KEY) === 'accepted'" script.js
+          grep -Fq "funnel_visit" script.js
+          grep -Fq "funnel_outbound_click" script.js
+
       - name: Check JavaScript syntax
         run: node --check script.js
