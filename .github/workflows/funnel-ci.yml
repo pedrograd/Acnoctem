@@ -8,6 +8,8 @@ on:
       - "script.js"
       - "style.css"
       - "CNAME"
+      - "robots.txt"
+      - "sitemap.xml"
       - ".github/workflows/funnel-ci.yml"
   push:
     branches: [main]
@@ -16,6 +18,8 @@ on:
       - "script.js"
       - "style.css"
       - "CNAME"
+      - "robots.txt"
+      - "sitemap.xml"
       - ".github/workflows/funnel-ci.yml"
 
 permissions:
@@ -47,6 +51,18 @@ jobs:
           fi
           grep -q 'https://acnoctem.net/' index.html
           test "$(tr -d '\r\n ' < CNAME)" = "acnoctem.net"
+      - name: Crawl discovery contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f robots.txt
+          test -f sitemap.xml
+          grep -Fq 'Sitemap: https://acnoctem.net/sitemap.xml' robots.txt
+          grep -Fq '<loc>https://acnoctem.net/</loc>' sitemap.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          ET.parse("sitemap.xml")
+          PY
       - name: No obvious secrets
         shell: bash
         run: |
